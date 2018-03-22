@@ -1,33 +1,62 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TextInput,
+} from 'react-native';
+import { TabNavigator } from 'react-navigation';
 
-export default class App extends React.Component {
-  foo() {
-    console.log(arguments)
-  }
 
+class TodayScreen extends React.Component {
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-        <Button
-          onPress={this.foo}
-          title="Learn More"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Home!</Text>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+class AddScreen extends React.Component {
+  render() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+        <View style={style.inputGroup}>
+          <Text>Surfer</Text>
+          <TextInput 
+			style={style.input}
+            onChangeText={(surfer) => {this.setState({surfer})}}
+          />
+        </View>
+
+		<View>
+			<Text>Sail</Text>
+			<TextInput
+				onChangeText={(sail)=>{this.setState({sail})}}
+			/>
+		</View>
+
+      </View>
+    );
+  }
+}
+
+const style = StyleSheet.create({
+	inputGroup: {
+   		flexDirection: 'row',
+	},
+	input: {
+		borderColor: 'black',
+	}
 });
+
+
+
+export default TabNavigator({
+  Today: { screen: TodayScreen },
+  Add: { screen: AddScreen },
+}, {initialRouteName: 'Add'});
+
