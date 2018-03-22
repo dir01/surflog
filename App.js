@@ -10,7 +10,7 @@ import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import { Font, AppLoading } from 'expo';
 import { View, Examples } from '@shoutem/ui';
-import AddScreen from './Add';
+import AddScreen from './AddScreen';
 
 class TodayScreen extends React.Component {
   render() {
