@@ -1,27 +1,9 @@
-import {
-  StyleSheet,
-  Text,
-  Button,
-  TextInput,
-} from 'react-native';
+import React from 'react';
 import { TabNavigator } from 'react-navigation';
-
-import React, { Component } from 'react';
-import { StatusBar } from 'react-native';
 import { Font, AppLoading } from 'expo';
-import { View, Examples } from '@shoutem/ui';
+
 import AddScreen from './AddScreen';
-
-class TodayScreen extends React.Component {
-  render() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Home!</Text>
-      </View>
-    );
-  }
-}
-
+import TodayScreen from './TodayScreen';
 
 
 const TabNav = TabNavigator({
