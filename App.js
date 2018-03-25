@@ -9,7 +9,7 @@ import TodayScreen from './TodayScreen';
 const TabNav = TabNavigator({
   Today: { screen: TodayScreen },
   Add: { screen: AddScreen },
-}, {initialRouteName: 'Add'});
+}, {initialRouteName: 'Today'});
 
 
 

@@ -18,7 +18,7 @@ class Storage {
     async getTodaySurfSessions() {
         const key = `days:${this._getTodayDataStr()}`;
         sessions = await AsyncStorage.getItem(key);
-        return JSON.parse(sessions);
+        return JSON.parse(sessions) || [];
     }
 
     _getTodayDataStr() {
