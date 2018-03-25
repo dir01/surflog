@@ -11,6 +11,7 @@ import {
 	Button,
 	Row,
 } from '@shoutem/ui';
+import moment from 'moment';
 
 
 export default class extends React.Component {
@@ -54,9 +55,10 @@ export default class extends React.Component {
   }
 
   onSubmit() {
-    const {surfer, sail, board, time} = this.state;
+    const {surfer, sail, board} = this.state;
     const surfSession = {
-        surfer, sail, board, time,
+        surfer, sail, board,
+        startTime: this.state.time,
         plannedDuration: this.state['planned duration']
     };
 
@@ -113,7 +115,6 @@ export default class extends React.Component {
   }
 
   getCurrentTimeString() {
-	const [hours, minutes, ] = new Date().toLocaleTimeString().split(':');
-	return `${hours}:${minutes}`;
+    return moment().format('HH:mm');
   }
 }

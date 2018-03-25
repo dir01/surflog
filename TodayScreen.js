@@ -1,7 +1,18 @@
 import React from 'react';
 import moment from 'moment';
-import { View, Text, ListView, Heading, Title, Divider, Tile } from '@shoutem/ui';
+import Swipeout from 'react-native-swipeout';
+import {
+    View,
+    Text,
+    ListView,
+    Heading,
+    Title,
+    Divider,
+    Tile,
+} from '@shoutem/ui';
+
 import storage from './storage';
+
 
 export default class extends React.Component {
     constructor(props){
@@ -18,17 +29,21 @@ export default class extends React.Component {
                 finished.push(session)
                 continue
             }
-            const startMoment = moment(session.time, 'hh:mm')
+            const startMoment = moment(session.startTime, 'hh:mm')
             const plannedEndMoment = startMoment.clone().add(session.plannedDuration, 'm');
-            const timeLeft = Math.round(plannedEndMoment.diff(moment())/1000/60);
-            const percentage = (session.plannedDuration - timeLeft) / session.plannedDuration
+            const now = moment();
+            const timeLeft = Math.round(plannedEndMoment.diff(now)/1000/60);
+            const percentage = (session.plannedDuration - timeLeft) / session.plannedDuration;
             inWater.push({timeLeft, percentage, ...session})
         }
-        this.setState({inWater: inWater})
+        console.log(finished);
+        this.setState({inWater, finished})
     }
 
     render() {
-        return this.state.inWater.length == 0 ? this.renderEmptyMessage() : this.renderSessionsList();
+        noInWater = this.state.inWater.length == 0;
+        noFinished = this.state.finished.length == 0;
+        return (noInWater && noFinished) ? this.renderEmptyMessage() : this.renderSessionsList();
     }
 
     renderEmptyMessage() {
@@ -45,12 +60,22 @@ export default class extends React.Component {
                     data={this.state.inWater}
                     renderRow={this.renderSingleInWaterSession.bind(this)}
                 />
+                <Tile styleName={'text-centric inflexible'}>
+                    <Title>Finished</Title>
+                </Tile>
+                <ListView
+                    data={this.state.finished}
+                    renderRow={this.renderSingleFinishedSession.bind(this)}
+                />
             </View>
         );
     }
 
     renderSingleInWaterSession(session, number) {
         return (
+            <Swipeout right={[
+                {text: 'Stop', onPress: this.onSessionStop.bind(this, session)}
+            ]}>
             <View key={number} style={{
                 flex: 1,
                 flexDirection: 'row',
@@ -62,11 +87,29 @@ export default class extends React.Component {
                 borderBottomColor: 'lightgray',
                 backgroundColor: getColor(session.percentage),
             }}>
-                <Heading>{session.time}  <Title>{session.surfer}</Title></Heading>
+                <Heading>{session.startTime}  <Title>{session.surfer}</Title></Heading>
                 <Title>{`${session.sail}/${session.board}`}</Title>
                 <Title>{`(${session.timeLeft})`}</Title>
             </View>
+            </Swipeout>
         )
+    }
+
+    renderSingleFinishedSession(session, number) {
+        return (
+            <View key={number} style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+            }}>
+                <Heading>{session.startTime}  <Title>{session.surfer}</Title></Heading>
+                <Title>{`${session.sail}/${session.board}`}</Title>
+            </View>
+        )
+    }
+
+    async onSessionStop(session) {
+        await storage.updateSurfSession(session.id, {endTime: moment().format('hh:mm')})
     }
 
 }
