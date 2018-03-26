@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AddForm from './AddForm';
 import storage from './storage';
+import {connect} from "react-redux";
+import {actionCreators} from "./actions";
 
-export default class extends React.Component {
+
+class AddScreen extends React.Component {
     render() {
         return <AddForm
             suggest={{
@@ -15,8 +18,12 @@ export default class extends React.Component {
     }
 
     onSurfSessionAdded(surfSession) {
-        storage.createSurfSession(surfSession)
+        this.props.dispatch(actionCreators.surfSessionAdded(surfSession));
         this.props.navigation.navigate('Today')
     }
 
 }
+
+export default connect(
+    (state) => ({surfSessions: state.surfSessions})
+)(AddScreen);

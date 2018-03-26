@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4';
-import { AsyncStorage } from 'react-native';
+import {AsyncStorage} from 'react-native';
 
 class Storage {
     async createSurfSession(sessionData) {
