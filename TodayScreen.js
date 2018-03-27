@@ -11,7 +11,6 @@ import {
     Tile,
 } from '@shoutem/ui';
 
-import storage from './storage';
 import {actionCreators} from "./actions";
 
 
@@ -21,8 +20,8 @@ class TodayScreen extends React.Component {
         const haveFinishedSessionse = this.finishedSessions.length !== 0;
         return (
             (haveInWaterSessions || haveFinishedSessionse)
-            ? this.renderSessionsList()
-            : this.renderEmptyMessage()
+                ? this.renderSessionsList()
+                : this.renderEmptyMessage()
         );
     }
 
@@ -55,9 +54,14 @@ class TodayScreen extends React.Component {
 
     renderSingleInWaterSession(session, number) {
         return (
-            <Swipeout right={[
-                {text: 'Stop', onPress: this.onSessionStop.bind(this, session)}
-            ]}>
+            <Swipeout
+                right={[
+                    {text: 'Stop', onPress: this.onSessionStop.bind(this, session)}
+                ]}
+                left={[
+                    {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
+                ]}
+            >
                 <View key={number} style={{
                     flex: 1,
                     flexDirection: 'row',
@@ -79,19 +83,29 @@ class TodayScreen extends React.Component {
 
     renderSingleFinishedSession(session, number) {
         return (
-            <View key={number} style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-            }}>
-                <Heading>{session.startTime} <Title>{session.surfer}</Title></Heading>
-                <Title>{`${session.sail}/${session.board}`}</Title>
-            </View>
+            <Swipeout
+                left={[
+                    {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
+                ]}
+            >
+                <View key={number} style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                }}>
+                    <Heading>{session.startTime} <Title>{session.surfer}</Title></Heading>
+                    <Title>{`${session.sail}/${session.board}`}</Title>
+                </View>
+            </Swipeout>
         )
     }
 
     onSessionStop(session) {
         this.props.dispatch(actionCreators.surfSessionFinished(session.id, moment().format('HH:mm')));
+    }
+
+    onSessionDelete(session) {
+        this.props.dispatch(actionCreators.surfSessionDeleted(session.id));
     }
 
     get inWaterSessions() {

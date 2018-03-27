@@ -18,6 +18,8 @@ function surfSessions(state = [], action) {
                 }
             }
             return newState;
+        case types.SURF_SESSION_DELETED:
+            return state.filter(s => s.id !== action.surfSessionId);
         default:
             return state;
     }
