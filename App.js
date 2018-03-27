@@ -25,8 +25,8 @@ class App extends React.Component {
     async componentWillMount() {
         await loadFonts();
         this.setState({fontsAreLoaded: true});
-        // const surfSessions = await storage.getTodaySurfSessions();
-        // this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
+        const surfSessions = await storage.getTodaySurfSessions();
+        this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
     }
 
     render() {
