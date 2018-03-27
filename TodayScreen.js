@@ -25,6 +25,14 @@ class TodayScreen extends React.Component {
         );
     }
 
+    componentDidMount() {
+        this.setState({rerenderInterval: setInterval(() => {this.forceUpdate()}, 10000)});
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.state.rerenderInterval);
+    }
+
     renderEmptyMessage() {
         return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <Text>No surf sessions today</Text>
