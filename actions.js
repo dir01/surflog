@@ -3,6 +3,7 @@ export const types = {
     SURF_SESSION_ADDED: 'SURF_SESSION_ADDED',
     SURF_SESSION_FINISHED: 'SURF_SESSION_FINISHED',
     SURF_SESSION_DELETED: 'SURF_SESSION_DELETED',
+    SUGGEST_ITEMS_LOADED: 'SUGGEST_ITEMS_LOADED',
 };
 
 
@@ -18,5 +19,8 @@ export const actionCreators = {
     },
     surfSessionDeleted: (surfSessionId) => {
         return {type: types.SURF_SESSION_DELETED, surfSessionId}
+    },
+    suggestItemsLoaded: (suggestItems) => {
+        return {type: types.SUGGEST_ITEMS_LOADED, suggestItems}
     }
 };

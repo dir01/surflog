@@ -27,6 +27,8 @@ class App extends React.Component {
         this.setState({fontsAreLoaded: true});
         const surfSessions = await storage.getTodaySurfSessions();
         this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
+        const suggestItems = await storage.loadSuggestItems();
+        this.props.dispatch(actionCreators.suggestItemsLoaded(suggestItems));
     }
 
     render() {

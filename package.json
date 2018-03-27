@@ -24,6 +24,7 @@
   "dependencies": {
     "@shoutem/ui": "^0.23.4",
     "expo": "^25.0.0",
+    "lodash": "^4.17.5",
     "mock-async-storage": "^2.0.2",
     "moment": "^2.21.0",
     "react": "16.2.0",

@@ -14,6 +14,14 @@ class Storage {
         return JSON.parse(sessions) || [];
     }
 
+    async writeSuggestItems(suggestItems) {
+        await AsyncStorage.setItem('suggestItems', JSON.stringify(suggestItems))
+    }
+
+    async loadSuggestItems() {
+        return JSON.parse(await AsyncStorage.getItem('suggestItems')) || {};
+    }
+
     async _createDayIfRequired() {
         const dateStr = this._getTodayDataStr();
         let days = await AsyncStorage.getItem('days') || '[]';

@@ -8,11 +8,7 @@ import {actionCreators} from "./actions";
 class AddScreen extends React.Component {
     render() {
         return <AddForm
-            suggest={{
-                surfer: ['Luka', 'Andrey', 'Alesya', 'Dima', 'Max', 'Ilya', 'Ksusha'],
-                sail: ['6.0', '5.8', '5.3', '4.0'],
-                board: ['133', '148', '133 gecko']
-            }}
+            suggest={this.props.suggestItems}
             onSubmit={this.onSurfSessionAdded.bind(this)}
         />
     }
@@ -25,5 +21,5 @@ class AddScreen extends React.Component {
 }
 
 export default connect(
-    (state) => ({surfSessions: state.surfSessions})
+    (state) => ({surfSessions: state.surfSessions, suggestItems: state.suggestItems})
 )(AddScreen);
