@@ -12,25 +12,35 @@ import {
 } from '@shoutem/ui';
 
 import {actionCreators} from "./actions";
+import SurfLogProcessor from "./core";
 
 
 class TodayScreen extends React.Component {
     render() {
-        const haveInWaterSessions = this.inWaterSessions.length !== 0;
-        const haveFinishedSessionse = this.finishedSessions.length !== 0;
+        const haveInWaterSessions = this.state.inWaterSessions.length !== 0;
+        const haveFinishedSessions = this.state.finishedSessions.length !== 0;
         return (
-            (haveInWaterSessions || haveFinishedSessionse)
+            (haveInWaterSessions || haveFinishedSessions)
                 ? this.renderSessionsList()
                 : this.renderEmptyMessage()
         );
     }
 
-    componentDidMount() {
-        this.setState({rerenderInterval: setInterval(() => {this.forceUpdate()}, 10000)});
+    componentWillMount() {
+        this.processSessions();
+        this.setState({updateInterval: setInterval(this.processSessions.bind(this), 1000)});
     }
 
     componentWillUnmount() {
-        clearInterval(this.state.rerenderInterval);
+        clearInterval(this.state.updateInterval);
+    }
+
+    processSessions() {
+        const processor = new SurfLogProcessor(this.props.surfSessions);
+        this.setState({
+            inWaterSessions: processor.inWaterSessions,
+            finishedSessions: processor.finishedSessions,
+        });
     }
 
     renderEmptyMessage() {
@@ -46,16 +56,18 @@ class TodayScreen extends React.Component {
                     <Title>In water</Title>
                 </Tile>
                 <ListView
-                    data={this.inWaterSessions}
+                    data={this.state.inWaterSessions}
                     renderRow={this.renderSingleInWaterSession.bind(this)}
                 />
                 <Tile styleName={'text-centric inflexible'}>
                     <Title>Finished</Title>
                 </Tile>
+                {/*
                 <ListView
-                    data={this.finishedSessions}
+                    data={this.state.finishedSessions}
                     renderRow={this.renderSingleFinishedSession.bind(this)}
                 />
+*/}
             </View>
         );
     }
@@ -116,25 +128,6 @@ class TodayScreen extends React.Component {
         this.props.dispatch(actionCreators.surfSessionDeleted(session.id));
     }
 
-    get inWaterSessions() {
-        const inWater = [];
-        for (const session of this.props.surfSessions) {
-            if (session.endTime) {
-                continue
-            }
-            const startMoment = moment(session.startTime, 'hh:mm');
-            const plannedEndMoment = startMoment.clone().add(session.plannedDuration, 'm');
-            const now = moment();
-            const timeLeft = Math.round(plannedEndMoment.diff(now) / 1000 / 60);
-            const percentage = (session.plannedDuration - timeLeft) / session.plannedDuration;
-            inWater.push({timeLeft, percentage, ...session})
-        }
-        return inWater;
-    }
-
-    get finishedSessions() {
-        return this.props.surfSessions.filter((s) => s.endTime);
-    }
 
 }
 
