@@ -18,7 +18,6 @@ const processor = new SurfLogProcessor(fakeSessions);
 
 
 test('In water sessions', () => {
-
     expect(processor.inWaterSessions).toEqual([
         {...di1, timeLeft: 3, percentage: 0.7},
         {...al2, timeLeft: 4, percentage: 0.6},

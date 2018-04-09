@@ -1,7 +1,7 @@
 import React from 'react';
-import AddForm from './AddForm';
-import storage from './storage';
 import {connect} from "react-redux";
+
+import AddForm from './AddForm';
 import {actionCreators} from "./actions";
 
 

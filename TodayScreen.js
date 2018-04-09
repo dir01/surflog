@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import pluralize from "pluralize";
 import Swipeout from 'react-native-swipeout';
 import {connect} from 'react-redux';
 import {
@@ -9,7 +10,11 @@ import {
     Heading,
     Title,
     Tile,
+    Row,
+    Button,
+    ScrollView
 } from '@shoutem/ui';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import {actionCreators} from "./actions";
 import SurfLogProcessor from "./core";
@@ -19,16 +24,24 @@ class TodayScreen extends React.Component {
     render() {
         const haveInWaterSessions = this.state.inWaterSessions.length !== 0;
         const haveFinishedSessions = this.state.finishedSessions.length !== 0;
-        return (
-            (haveInWaterSessions || haveFinishedSessions)
-                ? this.renderSessionsList()
-                : this.renderEmptyMessage()
-        );
+
+        if (haveInWaterSessions || haveFinishedSessions) {
+            return (
+                <ScrollView>
+                    {haveInWaterSessions && this.renderInWaterSessionsList()}
+                    {haveFinishedSessions && this.renderSummariesList()}
+                </ScrollView>
+            )
+        } else {
+            return this.renderEmptyMessage();
+        }
     }
 
     componentWillMount() {
         this.processSessions();
-        this.setState({updateInterval: setInterval(this.processSessions.bind(this), 1000)});
+        this.setState({
+            updateInterval: setInterval(this.processSessions.bind(this), 1000),
+        });
     }
 
     componentWillUnmount() {
@@ -49,7 +62,7 @@ class TodayScreen extends React.Component {
         </View>;
     }
 
-    renderSessionsList() {
+    renderInWaterSessionsList() {
         return (
             <View>
                 <Tile styleName={'text-centric inflexible'}>
@@ -59,20 +72,26 @@ class TodayScreen extends React.Component {
                     data={this.state.inWaterSessions}
                     renderRow={this.renderSingleInWaterSession.bind(this)}
                 />
+            </View>
+        );
+    }
+
+    renderSummariesList() {
+        return (
+            <View>
                 <Tile styleName={'text-centric inflexible'}>
                     <Title>Finished</Title>
                 </Tile>
-                {/*
                 <ListView
                     data={this.state.finishedSessions}
-                    renderRow={this.renderSingleFinishedSession.bind(this)}
+                    renderRow={this.renderSingleSummary.bind(this)}
                 />
-*/}
             </View>
         );
     }
 
     renderSingleInWaterSession(session, number) {
+        const colorStyle = {color: getColor(session.percentage)};
         return (
             <Swipeout
                 right={[
@@ -83,40 +102,81 @@ class TodayScreen extends React.Component {
                 ]}
             >
                 <View key={number} style={{
-                    flex: 1,
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingLeft: 15,
-                    paddingBottom: 10,
-                    paddingTop: 10,
+                    alignItems: 'center',
+                    padding: 10,
+                    backgroundColor: 'white',
                     borderBottomWidth: 1,
                     borderBottomColor: 'lightgray',
-                    backgroundColor: getColor(session.percentage),
                 }}>
-                    <Heading>{session.startTime} <Title>{session.surfer}</Title></Heading>
+                    <Row style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', padding: 0}}>
+                        <Icon name="access-time" size={30} style={{...colorStyle}}/>
+                        <Heading style={colorStyle}>{session.timeLeft}</Heading>
+                    </Row>
+                    <Heading style={{flex: 2}}>{session.surfer}</Heading>
                     <Title>{`${session.sail}/${session.board}`}</Title>
-                    <Title>{`(${session.timeLeft})`}</Title>
                 </View>
             </Swipeout>
         )
     }
 
-    renderSingleFinishedSession(session, number) {
+    renderSingleSummary(summary, number) {
+        const length = summary.sessions.length;
+        const avg = Math.round(summary.totalTimeMs / length / 1000 / 60);
+        const reportId = summary.surfer;
+
         return (
-            <Swipeout
-                left={[
-                    {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
-                ]}
-            >
-                <View key={number} style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                }}>
-                    <Heading>{session.startTime} <Title>{session.surfer}</Title></Heading>
-                    <Title>{`${session.sail}/${session.board}`}</Title>
-                </View>
-            </Swipeout>
+            <View style={{backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: 'lightgray'}}>
+
+                <Button
+                    key={number}
+                    onPress={() => {
+                        this.setState({openedSummary: this.state.openedSummary !== reportId ? reportId : null})
+                    }}
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Row>
+                        <Heading style={{flex: 0.5}}>{summary.surfer}</Heading>
+                        <View style={{flex: 0.5, flexDirection: 'column'}}>
+                            <Title style={{color: 'gray'}}>{summary.totalTimeStr}</Title>
+                            <Text>
+                                {`${length} ${pluralize('session', length)}`}
+                                {length > 1 && `, avg ${avg}m`}
+                            </Text>
+                        </View>
+                    </Row>
+                </Button>
+
+                {this.state.openedSummary === reportId && (
+                    <ListView
+                        data={summary.sessions}
+                        renderRow={session => {
+                            return (
+                                <Swipeout
+                                    left={[
+                                        {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
+                                    ]}
+                                >
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        padding: 10,
+                                        justifyContent: 'space-around',
+                                        alignItems: 'center',
+                                        backgroundColor: 'white',
+                                    }}>
+                                        <Text>{`${session.startTime}-${session.endTime}`}</Text>
+                                        <Text>{`${session.sail}/${session.board}`}</Text>
+                                    </View>
+                                </Swipeout>
+                            )
+                        }}/>
+                )}
+
+            </View>
         )
     }
 
