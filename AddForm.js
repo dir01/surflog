@@ -1,5 +1,6 @@
 import uuidv4 from 'uuid/v4';
 import React from 'react';
+import {connect} from "react-redux";
 import {ScrollView} from 'react-native';
 import {
     View,
@@ -14,7 +15,12 @@ import {
 import moment from 'moment';
 
 
-export default class extends React.Component {
+const addSuggestItemsToState = connect(
+    (state) => ({suggestItems: state.suggestItems})
+);
+
+
+class AddForm extends React.Component {
     componentWillMount() {
         this.setState({
             surfer: '',
@@ -97,7 +103,7 @@ export default class extends React.Component {
     }
 
     renderSuggestions(name) {
-        const options = this.props.suggest[name] || [];
+        const options = this.props.suggestItems[name] || [];
         return (
             <View style={{flexDirection: 'row', marginBottom: 10}}>
                 {options.map((o) => (
@@ -123,3 +129,5 @@ export default class extends React.Component {
         return moment().format('HH:mm');
     }
 }
+
+export default addSuggestItemsToState(AddForm);

@@ -17,9 +17,6 @@ class AddScreen extends React.Component {
         this.props.dispatch(actionCreators.surfSessionAdded(surfSession));
         this.props.navigation.navigate('Today')
     }
-
 }
 
-export default connect(
-    (state) => ({surfSessions: state.surfSessions, suggestItems: state.suggestItems})
-)(AddScreen);
+export default connect()(AddScreen);
