@@ -94,11 +94,10 @@ class TodayScreen extends React.Component {
         const colorStyle = {color: getColor(session.percentage)};
         return (
             <Swipeout
+                buttonWidth={60}
                 right={[
-                    {text: 'Stop', onPress: this.onSessionStop.bind(this, session)}
-                ]}
-                left={[
-                    {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
+                    makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
+                    makeButton('timer-off', 'royalblue', this.onSessionStop.bind(this, session)),
                 ]}
             >
                 <View key={number} style={{
@@ -157,8 +156,8 @@ class TodayScreen extends React.Component {
                         renderRow={session => {
                             return (
                                 <Swipeout
-                                    left={[
-                                        {text: 'Delete', onPress: this.onSessionDelete.bind(this, session)}
+                                    right={[
+                                        makeButton('delete', 'orangered',this.onSessionDelete.bind(this, session)),
                                     ]}
                                 >
                                     <View style={{
@@ -187,9 +186,26 @@ class TodayScreen extends React.Component {
     onSessionDelete(session) {
         this.props.dispatch(actionCreators.surfSessionDeleted(session.id));
     }
-
-
 }
+
+
+const makeButton = (iconName, backgroundColor, onPress) => {
+    return {
+        onPress: onPress,
+        component: <View style={{
+            backgroundColor: backgroundColor,
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }}><Icon
+            name={iconName}
+            size={30}
+            color="white"
+        /></View>
+    }
+};
+
 
 function getColor(value) {
     //value from 0 to 1
