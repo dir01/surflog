@@ -1,14 +1,14 @@
 import React from 'react';
 import {connect} from "react-redux";
 
-import AddForm from './AddForm';
+import SurfSessionForm from './SurfSessionForm';
 import {actionCreators} from "./actions";
 
 
 class AddScreen extends React.Component {
     render() {
-        return <AddForm
-            suggest={this.props.suggestItems}
+        return <SurfSessionForm
+            submitText="LOG SURF SESSION"
             onSubmit={this.onSurfSessionAdded.bind(this)}
         />
     }

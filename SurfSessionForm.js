@@ -22,12 +22,16 @@ const addSuggestItemsToState = connect(
 
 class AddForm extends React.Component {
     componentWillMount() {
+        const instance = this.props.instance || {};
+        const isEditing = Boolean(this.props.instance);
         this.setState({
-            surfer: '',
-            board: '',
-            sail: '',
-            time: this.getCurrentTimeString(),
-            'planned duration': '30',
+            instance, isEditing,
+            surfer: instance.surfer || '',
+            board: instance.board || '',
+            sail: instance.sail || '',
+            time: instance.startTime || this.getCurrentTimeString(),
+            'end time': isEditing ? instance.endTime || this.getCurrentTimeString() : null,
+            'planned duration': instance.plannedDuration || '30',
             errors: [],
         })
     }
@@ -37,7 +41,7 @@ class AddForm extends React.Component {
             <ScrollView>
 
                 <Tile styleName={'text-centric inflexible'}>
-                    <Title>Log surfing session</Title>
+                    <Title>{this.props.submitText}</Title>
                 </Tile>
 
                 {this.renderFormSection('surfer', renderSuggestions = true)}
@@ -46,14 +50,16 @@ class AddForm extends React.Component {
 
                 {this.renderFormSection('board', renderSuggestions = true)}
 
-                {this.renderFormSection('time', renderSuggestions = false, inputValue = this.getCurrentTimeString())}
+                {this.renderFormSection('time', renderSuggestions = false)}
 
-                {this.renderFormSection('planned duration', renderSuggestions = false, inputValue = "30")}
+                {this.state.isEditing && this.renderFormSection('end time', renderSuggestions = false)}
+
+                {!this.state.isEditing && this.renderFormSection('planned duration', renderSuggestions = false, inputValue = "30")}
 
                 <Divider styleName={'section-header'}/>
 
                 <Button style={{backgroundColor: 'lightgreen'}} onPress={this.onSubmit.bind(this)}>
-                    <Text>LOG SURF SESSION</Text>
+                    <Text>{this.props.submitText}</Text>
                 </Button>
 
             </ScrollView>
@@ -63,15 +69,16 @@ class AddForm extends React.Component {
     onSubmit() {
         const {surfer, sail, board} = this.state;
         const surfSession = {
-            id: uuidv4(),
+            id: this.state.instance.id || uuidv4(),
             startTime: this.state.time,
+            endTime: this.state['end time'],
             plannedDuration: this.state['planned duration'],
             surfer, sail, board,
         };
 
         const errors = {};
         for (const key in surfSession) {
-            if (!surfSession[key]) {
+            if (surfSession[key] === '') {
                 errors[key] = 'Required';
             }
         }

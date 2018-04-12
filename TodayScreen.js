@@ -95,8 +95,10 @@ class TodayScreen extends React.Component {
         return (
             <Swipeout
                 buttonWidth={60}
+                autoClose={true}
                 right={[
                     makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
+                    makeButton('edit', 'orange', this.onSessionEdit.bind(this, session)),
                     makeButton('timer-off', 'royalblue', this.onSessionStop.bind(this, session)),
                 ]}
             >
@@ -156,7 +158,9 @@ class TodayScreen extends React.Component {
                         renderRow={session => {
                             return (
                                 <Swipeout
+                                    autoClose={true}
                                     right={[
+                                        makeButton('edit', 'orange',this.onSessionEdit.bind(this, session)),
                                         makeButton('delete', 'orangered',this.onSessionDelete.bind(this, session)),
                                     ]}
                                 >
@@ -185,6 +189,10 @@ class TodayScreen extends React.Component {
 
     onSessionDelete(session) {
         this.props.dispatch(actionCreators.surfSessionDeleted(session.id));
+    }
+
+    onSessionEdit(session) {
+        this.props.navigation.navigate('Edit', session);
     }
 }
 

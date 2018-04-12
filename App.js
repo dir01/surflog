@@ -1,5 +1,5 @@
 import React from 'react';
-import {TabNavigator} from 'react-navigation';
+import {TabNavigator, StackNavigator} from 'react-navigation';
 import {Font, AppLoading} from 'expo';
 import {Provider, connect} from 'react-redux';
 
@@ -7,12 +7,18 @@ import {Provider, connect} from 'react-redux';
 import configureStore from './configureStore';
 import storage from "./storage";
 import AddScreen from './AddScreen';
+import EditScreen from './EditScreen';
 import TodayScreen from './TodayScreen';
 import {actionCreators} from "./actions";
 
 
+const TodayStack = StackNavigator({
+    List: {screen: TodayScreen},
+    Edit: {screen: EditScreen},
+});
+
 const TabNav = TabNavigator({
-    Today: {screen: TodayScreen},
+    Today: {screen: TodayStack},
     Add: {screen: AddScreen},
 }, {initialRouteName: 'Today'});
 

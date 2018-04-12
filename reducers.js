@@ -4,18 +4,23 @@ import {types} from "./actions";
 
 
 function surfSessions(state = [], action) {
+    const updateSurfSession = (surfSessionId, data) => {
+        const newState = [...state];
+        const sessionIndex = _.findIndex(newState, s => s.id === surfSessionId);
+        newState[sessionIndex] = {...newState[sessionIndex], ...data};
+        return newState;
+    };
     switch (action.type) {
         case types.SURF_SESSIONS_LOADED:
             return action.payload;
         case types.SURF_SESSION_ADDED:
             return [...state, action.payload];
         case types.SURF_SESSION_FINISHED:
-            const newState = [...state];
-            const sessionIndex = _.findIndex(newState, s => s.id === action.surfSessionId);
-            newState[sessionIndex] = {...newState[sessionIndex], endTime: action.endTime};
-            return newState;
+            return updateSurfSession(action.surfSessionId, {endTime: action.endTime});
         case types.SURF_SESSION_DELETED:
             return state.filter(s => s.id !== action.surfSessionId);
+        case types.SURF_SESSION_EDITED:
+            return updateSurfSession(action.payload.id, action.payload);
         default:
             return state;
     }
