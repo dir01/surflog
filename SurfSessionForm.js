@@ -142,7 +142,7 @@ class AddForm extends React.Component {
 
 
 const styles = {
-    formContainer: {flex: 1, justifyContent: 'space-between'},
+    formContainer: {flex: 1, justifyContent: 'space-between', backgroundColor: 'white'},
     labelContainer: {
         alignSelf: 'stretch',
         flexDirection: 'row',

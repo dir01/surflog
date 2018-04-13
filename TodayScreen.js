@@ -14,6 +14,7 @@ import {
     Button,
     ScrollView
 } from '@shoutem/ui';
+import {Button as RNButton} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import {actionCreators} from "./actions";
@@ -21,26 +22,42 @@ import SurfLogProcessor from "./core";
 
 
 class TodayScreen extends React.Component {
+    static navigationOptions = ({navigation}) => {
+        const params = navigation.state.params || {};
+        return {
+            headerRight: (
+                <RNButton onPress={()=>params.onButtonPress()} title="Add"/>
+            ),
+        };
+    };
+
+
     render() {
         const haveInWaterSessions = this.state.inWaterSessions.length !== 0;
         const haveFinishedSessions = this.state.finishedSessions.length !== 0;
 
-        if (haveInWaterSessions || haveFinishedSessions) {
-            return (
-                <ScrollView>
-                    {haveInWaterSessions && this.renderInWaterSessionsList()}
-                    {haveFinishedSessions && this.renderSummariesList()}
-                </ScrollView>
-            )
-        } else {
-            return this.renderEmptyMessage();
+        if (!haveInWaterSessions && !haveFinishedSessions) {
+            this.props.navigation.replace('Add');
+            return null;
         }
+
+        return (
+            <ScrollView>
+                {haveInWaterSessions && this.renderInWaterSessionsList()}
+                {haveFinishedSessions && this.renderSummariesList()}
+            </ScrollView>
+        )
     }
 
     componentWillMount() {
         this.processSessions();
         this.setState({
             updateInterval: setInterval(this.processSessions.bind(this), 1000),
+        });
+        this.props.navigation.setParams({
+            onButtonPress: () => {
+                this.props.navigation.navigate('Add')
+            }
         });
     }
 
@@ -54,12 +71,6 @@ class TodayScreen extends React.Component {
             inWaterSessions: processor.inWaterSessions,
             finishedSessions: processor.finishedSessions,
         });
-    }
-
-    renderEmptyMessage() {
-        return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Text>No surf sessions today</Text>
-        </View>;
     }
 
     renderInWaterSessionsList() {
@@ -94,7 +105,7 @@ class TodayScreen extends React.Component {
         const colorStyle = {color: getColor(session.percentage)};
         return (
             <Swipeout
-                buttonWidth={60}
+                buttonWidth={70}
                 autoClose={true}
                 right={[
                     makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
@@ -160,8 +171,8 @@ class TodayScreen extends React.Component {
                                 <Swipeout
                                     autoClose={true}
                                     right={[
-                                        makeButton('edit', 'orange',this.onSessionEdit.bind(this, session)),
-                                        makeButton('delete', 'orangered',this.onSessionDelete.bind(this, session)),
+                                        makeButton('edit', 'orange', this.onSessionEdit.bind(this, session)),
+                                        makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
                                     ]}
                                 >
                                     <View style={{

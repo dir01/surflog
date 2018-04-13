@@ -1,5 +1,5 @@
 import React from 'react';
-import {TabNavigator, StackNavigator} from 'react-navigation';
+import {StackNavigator} from 'react-navigation';
 import {Font, AppLoading} from 'expo';
 import {Provider, connect} from 'react-redux';
 
@@ -12,49 +12,38 @@ import TodayScreen from './TodayScreen';
 import {actionCreators} from "./actions";
 
 
-const TodayStack = StackNavigator({
-    List: {screen: TodayScreen},
-    Edit: {screen: EditScreen},
-});
-
-const TabNav = TabNavigator({
-    Today: {screen: TodayStack},
-    Add: {screen: AddScreen},
-}, {initialRouteName: 'Today'});
 
 
 class App extends React.Component {
     state = {
-        fontsAreLoaded: false,
+        isLoadingComplete: false,
     };
 
     async componentWillMount() {
         await loadFonts();
-        this.setState({fontsAreLoaded: true});
         const surfSessions = await storage.getTodaySurfSessions();
         this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
         const suggestItems = await storage.loadSuggestItems();
         this.props.dispatch(actionCreators.suggestItemsLoaded(suggestItems));
+        this.setState({
+            isLoadingComplete: true,
+            haveSurfSessions: Boolean(surfSessions.length),
+        });
     }
 
     render() {
-        if (!this.state.fontsAreLoaded) {
+        if (!this.state.isLoadingComplete) {
             return <AppLoading/>;
         } else {
-            return <TabNav/>;
+            const Navigation = StackNavigator({
+                Today: {screen: TodayScreen},
+                Add: {screen: AddScreen},
+                Edit: {screen: EditScreen},
+            }, {initialRouteName: this.state.haveSurfSessions ? 'Today' : 'Add'});
+             return <Navigation/>;
         }
     }
 }
-
-const AppWithDispatch = connect()(App);
-
-
-export default AppWithStore = () => (
-    <Provider store={configureStore()}>
-        <AppWithDispatch/>
-    </Provider>
-);
-
 
 function loadFonts() {
     return Font.loadAsync({
@@ -71,3 +60,14 @@ function loadFonts() {
         'rubicon-icon-font': require('./node_modules/@shoutem/ui/fonts/rubicon-icon-font.ttf'),
     });
 }
+
+
+const AppWithDispatch = connect()(App);
+
+export default AppWithStore = () => (
+    <Provider store={configureStore()}>
+        <AppWithDispatch/>
+    </Provider>
+);
+
+
