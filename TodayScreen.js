@@ -30,28 +30,32 @@ class TodayScreen extends React.Component {
         };
     };
 
-    render() {
-        const haveInWaterSessions = this.state.inWaterSessions.length !== 0;
-        const haveFinishedSessions = this.state.finishedSessions.length !== 0;
+    state = {
+        openedSummary: null,
+    };
 
-        if (!haveInWaterSessions && !haveFinishedSessions) {
+    render() {
+        const {inWaterSessions, finishedSessions} = new SurfLogProcessor(this.props.surfSessions);
+
+        if (!inWaterSessions.length && !finishedSessions.length) {
             this.props.navigation.replace('Add');
             return null;
         }
 
         return (
             <ScrollView style={{backgroundColor: 'white'}}>
-                {haveInWaterSessions && this.renderInWaterSessionsList()}
-                {haveFinishedSessions && this.renderSummariesList()}
+                {this.renderInWaterSessionsList(inWaterSessions)}
+                {this.renderSummariesList(finishedSessions)}
             </ScrollView>
         )
     }
 
     componentWillMount() {
-        this.processSessions();
-        this.setState({
-            updateInterval: setInterval(this.processSessions.bind(this), 5000),
-        });
+        this.setState({updateInterval: setInterval(() => {
+            if (this.props.navigation.isFocused()) {
+                this.forceUpdate();
+            }
+        }, 10000)});
         this.props.navigation.setParams({
             onButtonPress: () => {
                 this.props.navigation.navigate('Add')
@@ -63,39 +67,36 @@ class TodayScreen extends React.Component {
         clearInterval(this.state.updateInterval);
     }
 
-    processSessions() {
-        const processor = new SurfLogProcessor(this.props.surfSessions);
-        this.setState({
-            inWaterSessions: processor.inWaterSessions,
-            finishedSessions: processor.finishedSessions,
-        });
-    }
-
-    renderInWaterSessionsList() {
+    renderInWaterSessionsList(inWaterSessions) {
+        if (!inWaterSessions.length) {
+            return null;
+        }
         return (
             <View>
                 <Tile styleName={'text-centric inflexible'}>
                     <Title>In water</Title>
                 </Tile>
                 <ListView
-                    data={this.state.inWaterSessions}
+                    data={inWaterSessions}
                     renderRow={this.renderSingleInWaterSession.bind(this)}
                 />
             </View>
         );
     }
 
-    renderSummariesList() {
+    renderSummariesList(finishedSessions) {
+        if (!finishedSessions.length) {
+            return null
+        }
         return (
             <View>
                 <Tile styleName={'text-centric inflexible'}>
                     <Title>Finished</Title>
                 </Tile>
                 <ListView
-                    data={this.state.finishedSessions}
+                    data={finishedSessions}
                     renderRow={this.renderSingleSummary.bind(this)}
                     key={this.state.openedSummary}
-
                 />
             </View>
         );
