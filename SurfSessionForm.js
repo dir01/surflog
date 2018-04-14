@@ -71,7 +71,8 @@ class AddForm extends React.Component {
         const {surfer, sail, board, startTime, endTime, plannedDuration} = this.state;
         const surfSession = {
             id: this.state.instance.id || uuidv4(),
-            surfer, sail, board, startTime, endTime, plannedDuration
+            endTime: endTime || null,
+            surfer, sail, board, startTime, plannedDuration
         };
 
         const errors = {};
