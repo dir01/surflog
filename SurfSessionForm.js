@@ -15,7 +15,7 @@ import TextInput from './TextInput';
 import moment from 'moment';
 
 
-const addSuggestItemsToState = connect(
+const addSuggestItemsToProps = connect(
     (state) => ({suggestItems: state.suggestItems})
 );
 
@@ -29,9 +29,9 @@ class AddForm extends React.Component {
             surfer: instance.surfer || '',
             board: instance.board || '',
             sail: instance.sail || '',
-            time: instance.startTime || this.getCurrentTimeString(),
-            'end time': isEditing ? instance.endTime || this.getCurrentTimeString() : null,
-            'planned duration': instance.plannedDuration || '30',
+            startTime: instance.startTime || this.getCurrentTimeString(),
+            endTime: instance.endTime || null,
+            plannedDuration: instance.plannedDuration || '30',
             errors: [],
         })
     }
@@ -51,11 +51,11 @@ class AddForm extends React.Component {
 
                     {this.renderFormSection('board', renderSuggestions = true)}
 
-                    {this.renderFormSection('time', renderSuggestions = false)}
+                    {this.renderFormSection('startTime', renderSuggestions = false)}
 
-                    {this.state.isEditing && this.renderFormSection('end time', renderSuggestions = false)}
+                    {this.state.isEditing && this.renderFormSection('endTime', renderSuggestions = false)}
 
-                    {!this.state.isEditing && this.renderFormSection('planned duration', renderSuggestions = false, inputValue = "30")}
+                    {!this.state.isEditing && this.renderFormSection('plannedDuration', renderSuggestions = false, inputValue = "30")}
 
                 </View>
                 <View>
@@ -68,13 +68,10 @@ class AddForm extends React.Component {
     }
 
     onSubmit() {
-        const {surfer, sail, board} = this.state;
+        const {surfer, sail, board, startTime, endTime, plannedDuration} = this.state;
         const surfSession = {
             id: this.state.instance.id || uuidv4(),
-            startTime: this.state.time,
-            endTime: this.state['end time'],
-            plannedDuration: this.state['planned duration'],
-            surfer, sail, board,
+            surfer, sail, board, startTime, endTime, plannedDuration
         };
 
         const errors = {};
@@ -98,7 +95,7 @@ class AddForm extends React.Component {
             <View>
                 <Row>
                     <TouchableOpacity style={styles.labelContainer} onPress={() => input.focus()}>
-                        <Text style={styles.labelText}>{name.toUpperCase()}</Text>
+                        <Text style={styles.labelText}>{name.replace(/([A-Z])/g, ' $1').toUpperCase()}</Text>
                     </TouchableOpacity>
                     <TextInput
                         inputRef={element => {
@@ -113,7 +110,7 @@ class AddForm extends React.Component {
                         placeholder={error ? error : null}
                     />
                 </Row>
-                {renderSuggestions && this.renderSuggestions(name)}
+                {renderSuggestions ? this.renderSuggestions(name) : null}
             </View>
         )
     }
@@ -179,4 +176,4 @@ const styles = {
 };
 
 
-export default addSuggestItemsToState(AddForm);
+export default addSuggestItemsToProps(AddForm);
