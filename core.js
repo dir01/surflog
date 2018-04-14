@@ -13,10 +13,15 @@ export default class SurfLogProcessor {
             .map(s => {
                 const now = moment();
                 const startMoment = moment(s.startTime, 'HH:mm');
-                const plannedEndMoment = startMoment.clone().add(s.plannedDuration, 'm');
+                const plannedDuration = s.plannedDuration;
+                const plannedEndMoment = startMoment.clone().add(plannedDuration, 'm');
                 const timeLeft = Math.round(plannedEndMoment.diff(now) / 1000 / 60);
-                const percentage = (s.plannedDuration - timeLeft) / s.plannedDuration;
-                return {...s, timeLeft, percentage}
+                const timePassed = plannedDuration - timeLeft;
+                const percentage = (plannedDuration - timeLeft) / plannedDuration;
+                return {
+                    ...s, timeLeft, timePassed, percentage,
+                    plannedEndTime: plannedEndMoment.format('HH:mm'),
+                }
             })
             .sortBy(s => s.timeLeft)
             .value();
@@ -25,6 +30,13 @@ export default class SurfLogProcessor {
     get finishedSessions() {
         return _(this._surfSessions)
             .filter(s => s.endTime)
+            .map(s => {
+                const endMoment = moment(s.endTime, 'HH:mm');
+                const startMoment = moment(s.startTime, 'HH:mm');
+                const timePassed = endMoment.diff(startMoment) / 1000 / 60;
+                const percentage = timePassed / s.plannedDuration;
+                return {...s, timePassed, percentage}
+            })
             .groupBy(s => s.surfer)
             .transform((result, sessions, surfer) => {
                 const totalTimeMs = _.sumBy(sessions, (s) => {

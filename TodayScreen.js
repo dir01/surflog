@@ -10,9 +10,8 @@ import {
     Heading,
     Title,
     Tile,
-    Row,
-    Button,
-    ScrollView
+    ScrollView,
+    TouchableOpacity,
 } from '@shoutem/ui';
 import {Button as RNButton} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -26,11 +25,10 @@ class TodayScreen extends React.Component {
         const params = navigation.state.params || {};
         return {
             headerRight: (
-                <RNButton onPress={()=>params.onButtonPress()} title="Add"/>
+                <RNButton onPress={() => params.onButtonPress()} title="Add"/>
             ),
         };
     };
-
 
     render() {
         const haveInWaterSessions = this.state.inWaterSessions.length !== 0;
@@ -42,7 +40,7 @@ class TodayScreen extends React.Component {
         }
 
         return (
-            <ScrollView>
+            <ScrollView style={{backgroundColor: 'white'}}>
                 {haveInWaterSessions && this.renderInWaterSessionsList()}
                 {haveFinishedSessions && this.renderSummariesList()}
             </ScrollView>
@@ -52,7 +50,7 @@ class TodayScreen extends React.Component {
     componentWillMount() {
         this.processSessions();
         this.setState({
-            updateInterval: setInterval(this.processSessions.bind(this), 1000),
+            updateInterval: setInterval(this.processSessions.bind(this), 50),
         });
         this.props.navigation.setParams({
             onButtonPress: () => {
@@ -96,17 +94,18 @@ class TodayScreen extends React.Component {
                 <ListView
                     data={this.state.finishedSessions}
                     renderRow={this.renderSingleSummary.bind(this)}
+
                 />
             </View>
         );
     }
 
     renderSingleInWaterSession(session, number) {
-        const colorStyle = {color: getColor(session.percentage)};
         return (
             <Swipeout
                 buttonWidth={70}
                 autoClose={true}
+                style={{backgroundColor: 'white'}}
                 right={[
                     makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
                     makeButton('edit', 'orange', this.onSessionEdit.bind(this, session)),
@@ -115,20 +114,33 @@ class TodayScreen extends React.Component {
             >
                 <View key={number} style={{
                     flexDirection: 'row',
+                    padding: 20,
                     alignItems: 'center',
-                    padding: 10,
-                    backgroundColor: 'white',
                     borderBottomWidth: 1,
                     borderBottomColor: 'lightgray',
+                    marginLeft: 30,
                 }}>
-                    <Row style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', padding: 0}}>
-                        <Icon name="access-time" size={30} style={{...colorStyle}}/>
-                        <Heading style={colorStyle}>{session.timeLeft}</Heading>
-                    </Row>
                     <Heading style={{flex: 2}}>{session.surfer}</Heading>
-                    <Title>{`${session.sail}/${session.board}`}</Title>
+                    <View style={{flex: 2, flexDirection: 'column', justifyContent: 'space-between'}}>
+                        {this.renderSessionInfo(session)}
+                        <Text styleName="secondary" style={{paddingTop: 4,}}>
+                            {`${session.sail}/${session.board}`}
+                        </Text>
+                    </View>
                 </View>
             </Swipeout>
+        )
+    }
+
+    renderSessionInfo(session) {
+        const color = getColor(session.percentage);
+        return (
+            <View style={{flexDirection: 'row'}}>
+                <Title style={{color: 'gray'}}>
+                    {`${session.startTime}–${session.endTime || moment().format('HH:mm')}, `}
+                </Title>
+                <Title style={{color}}>{session.timePassed}m</Title>
+            </View>
         )
     }
 
@@ -138,61 +150,71 @@ class TodayScreen extends React.Component {
         const reportId = summary.surfer;
 
         return (
-            <View style={{backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: 'lightgray'}}>
+            <View style={{
+                flexDirection: 'column',
+                padding: 20,
+                paddingLeft: 60,
+                borderBottomWidth: 1,
+                borderBottomColor: 'lightgray',
+                backgroundColor: 'white'
+            }}>
 
-                <Button
+                <TouchableOpacity
                     key={number}
                     onPress={() => {
-                        this.setState({openedSummary: this.state.openedSummary !== reportId ? reportId : null})
+                        this.setState({
+                            openedSummary: this.state.openedSummary !== reportId ? reportId : null
+                        })
                     }}
                     style={{
+                        padding: 0,
+                        margin: 0,
                         flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Row>
-                        <Heading style={{flex: 0.5}}>{summary.surfer}</Heading>
-                        <View style={{flex: 0.5, flexDirection: 'column'}}>
-                            <Title style={{color: 'gray'}}>{summary.totalTimeStr}</Title>
-                            <Text>
-                                {`${length} ${pluralize('session', length)}`}
-                                {length > 1 && `, avg ${avg}m`}
-                            </Text>
-                        </View>
-                    </Row>
-                </Button>
+                    }}>
+                    <Heading style={{flex: 2}}>{summary.surfer}</Heading>
+                    <View style={{flex: 2, flexDirection: 'column', justifyContent: 'space-between'}}>
+                        <Title style={{color: 'gray'}}>{summary.totalTimeStr}</Title>
+                        <Text styleName="secondary" style={{paddingTop: 4}}>
+                            {`${length} ${pluralize('session', length)}`}
+                            {length > 1 && `, avg ${avg}m`}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
 
-                {this.state.openedSummary === reportId && (
+                {this.state.openedSummary === reportId ? (
                     <ListView
                         data={summary.sessions}
-                        renderRow={session => {
-                            return (
-                                <Swipeout
-                                    autoClose={true}
-                                    right={[
-                                        makeButton('edit', 'orange', this.onSessionEdit.bind(this, session)),
-                                        makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
-                                    ]}
-                                >
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        padding: 10,
-                                        justifyContent: 'space-around',
-                                        alignItems: 'center',
-                                        backgroundColor: 'white',
-                                    }}>
-                                        <Text>{`${session.startTime}-${session.endTime}`}</Text>
-                                        <Text>{`${session.sail}/${session.board}`}</Text>
-                                    </View>
-                                </Swipeout>
-                            )
-                        }}/>
-                )}
+                        renderRow={this.renderSingleFinishedSession.bind(this)}
+                    />
+                ) : null}
 
             </View>
         )
     }
+
+    renderSingleFinishedSession(session, sectionID, rowID) {
+        return (
+            <Swipeout
+                autoClose={true}
+                right={[
+                    makeButton('edit', 'orange', this.onSessionEdit.bind(this, session)),
+                    makeButton('delete', 'orangered', this.onSessionDelete.bind(this, session)),
+                ]}
+            >
+                <View style={{
+                    flexDirection: 'row',
+                    padding: 10,
+                    backgroundColor: 'white',
+                    alignItems: 'center',
+                }}>
+                    <Title style={{color: 'gray'}}>{`${Number(rowID) + 1}) `}</Title>
+                    {this.renderSessionInfo(session)}
+                    <Title style={{marginLeft: 10, color: 'gray'}}>{`${session.sail}/${session.board}`}</Title>
+                </View>
+            </Swipeout>
+        )
+    }
+
 
     onSessionStop(session) {
         this.props.dispatch(actionCreators.surfSessionFinished(session.id, moment().format('HH:mm')));
@@ -229,7 +251,7 @@ const makeButton = (iconName, backgroundColor, onPress) => {
 function getColor(value) {
     //value from 0 to 1
     const hue = ((1 - value) * 120).toString(10);
-    return ["hsl(", hue, ",100%,50%)"].join("");
+    return ["hsl(", hue, ",100%,48%)"].join("");
 }
 
 
