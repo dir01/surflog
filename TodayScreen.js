@@ -50,7 +50,7 @@ class TodayScreen extends React.Component {
     componentWillMount() {
         this.processSessions();
         this.setState({
-            updateInterval: setInterval(this.processSessions.bind(this), 50),
+            updateInterval: setInterval(this.processSessions.bind(this), 5000),
         });
         this.props.navigation.setParams({
             onButtonPress: () => {
@@ -94,6 +94,7 @@ class TodayScreen extends React.Component {
                 <ListView
                     data={this.state.finishedSessions}
                     renderRow={this.renderSingleSummary.bind(this)}
+                    key={this.state.openedSummary}
 
                 />
             </View>
