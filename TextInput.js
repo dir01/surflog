@@ -1,3 +1,5 @@
+// A hack around shoutem/TextInput's inability to .focus() and properly refere underlying React Native's TextInput
+
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {TextInput as RNTextInput} from 'react-native';

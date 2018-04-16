@@ -1,12 +1,10 @@
 import uuidv4 from 'uuid/v4';
 import React from 'react';
 import {connect} from "react-redux";
-import {ScrollView, StyleSheet} from 'react-native';
+import {ScrollView, Dimensions} from 'react-native';
 import {
     View,
     Text,
-    Tile,
-    Title,
     Button,
     Row,
     TouchableOpacity,
@@ -38,12 +36,8 @@ class AddForm extends React.Component {
 
     render() {
         return (
-            <ScrollView contentContainerStyle={styles.formContainer}>
-                <View>
-
-                    <Tile styleName={'text-centric inflexible'}>
-                        <Title>{this.props.submitText}</Title>
-                    </Tile>
+            <View style={styles.formContainer}>
+                <ScrollView>
 
                     {this.renderFormSection('surfer', renderSuggestions = true)}
 
@@ -57,13 +51,13 @@ class AddForm extends React.Component {
 
                     {!this.state.isEditing && this.renderFormSection('plannedDuration', renderSuggestions = false, inputValue = "30")}
 
-                </View>
+                </ScrollView>
                 <View>
                     <Button style={styles.submitButton} onPress={this.onSubmit.bind(this)}>
                         <Text style={styles.submitButtonText}>{this.props.submitText}</Text>
                     </Button>
                 </View>
-            </ScrollView>
+            </View>
         );
     }
 
@@ -140,11 +134,16 @@ class AddForm extends React.Component {
 
 
 const styles = {
-    formContainer: {flex: 1, justifyContent: 'space-between', backgroundColor: 'white'},
+    formContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
+        backgroundColor: 'white',
+        paddingTop: 30,
+    },
     labelContainer: {
         alignSelf: 'stretch',
         flexDirection: 'row',
-        flex: 1
+        flex: 2,
     },
     labelText: {
         flexDirection: 'row',
@@ -156,13 +155,20 @@ const styles = {
         borderColor: 'lightgray',
         flex: 4,
     },
-    suggestionContainer: {flexDirection: 'row', marginBottom: 10, marginLeft: 15, backgroundColor: 'white'},
+    suggestionContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginBottom: 10,
+        marginLeft: 15,
+        backgroundColor: 'white'
+    },
     suggestionButton: {
         backgroundColor: '#999',
         borderColor: '#999',
         borderRadius: 4,
         padding: 5,
         marginRight: 5,
+        marginBottom: 5,
     },
     suggestionText: {
         paddingRight: 2,

@@ -1,12 +1,16 @@
 import React from 'react';
 import {connect} from "react-redux";
+import {NavigationActions} from 'react-navigation';
 
 import SurfSessionForm from './SurfSessionForm';
 import {actionCreators} from "./actions";
-import { NavigationActions } from 'react-navigation';
 
 
 class AddScreen extends React.Component {
+    static navigationOptions = {
+        title: 'Log surf session'
+    };
+
     render() {
         return <SurfSessionForm
             submitText="LOG SURF SESSION"

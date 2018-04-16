@@ -5,6 +5,11 @@ import SurfSessionForm from "./SurfSessionForm";
 
 
 class EditScreen extends React.Component {
+    static navigationOptions = {
+        title: 'Edit surf session'
+    };
+
+
     render() {
         const surfSession = this.props.navigation.state.params;
         return <SurfSessionForm
