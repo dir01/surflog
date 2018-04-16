@@ -37,8 +37,13 @@ class TodayScreen extends React.Component {
         const {inWaterSessions, finishedSessions} = new SurfLogProcessor(this.props.surfSessions);
 
         if (!inWaterSessions.length && !finishedSessions.length) {
-            this.props.navigation.replace('Add');
-            return null;
+            return <View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <Title>No surf sessions today</Title>
+            </View>;
         }
 
         return (
@@ -78,7 +83,7 @@ class TodayScreen extends React.Component {
     }
 
     onSessionStop(session) {
-        this.props.dispatch(actionCreators.surfSessionFinished(session.id, moment().format('HH:mm')));
+        this.props.dispatch(actionCreators.surfSessionFinished(session));
     }
 
     onSessionDelete(session) {

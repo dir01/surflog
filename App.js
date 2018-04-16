@@ -1,46 +1,53 @@
 import React from 'react';
 import {StackNavigator} from 'react-navigation';
-import {Font, AppLoading} from 'expo';
+import {Font} from 'expo';
 import {Provider, connect} from 'react-redux';
-
 
 import configureStore from './configureStore';
 import AddScreen from './AddScreen';
 import EditScreen from './EditScreen';
 import TodayScreen from './TodayScreen';
+import repository from "./persistance";
 import {actionCreators} from "./actions";
-import {repository} from "./persistance";
+import {View, Spinner} from "@shoutem/ui";
 
 
+const Navigation = StackNavigator({
+    Today: {screen: TodayScreen},
+    Add: {screen: AddScreen},
+    Edit: {screen: EditScreen},
+}, {initialRouteName: 'Today'});
 
 
 class App extends React.Component {
     state = {
-        isLoadingComplete: false,
+        isAppLoaded: false
     };
 
     async componentWillMount() {
         await loadFonts();
-        const surfSessions = await repository.getTodaySurfSessions();
-        this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
-        const suggestItems = await repository.loadSuggestItems();
-        this.props.dispatch(actionCreators.suggestItemsLoaded(suggestItems));
-        this.setState({
-            isLoadingComplete: true,
-            haveSurfSessions: Boolean(surfSessions.length),
+        repository.onTodaySurfSessionsLoaded((surfSessions) => {
+            this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
+            this.setState({isAppLoaded: true})
+        });
+        repository.onSuggestItemsLoaded((suggestItems) => {
+            this.props.dispatch(actionCreators.suggestItemsLoaded(suggestItems));
         });
     }
 
     render() {
-        if (!this.state.isLoadingComplete) {
-            return <AppLoading/>;
+        if (this.state.isAppLoaded) {
+            return <Navigation/>
         } else {
-            const Navigation = StackNavigator({
-                Today: {screen: TodayScreen},
-                Add: {screen: AddScreen},
-                Edit: {screen: EditScreen},
-            }, {initialRouteName: this.state.haveSurfSessions ? 'Today' : 'Add'});
-             return <Navigation/>;
+            return (
+                <View style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Spinner size="large"/>
+                </View>
+            );
         }
     }
 }
@@ -60,7 +67,6 @@ function loadFonts() {
         'rubicon-icon-font': require('./node_modules/@shoutem/ui/fonts/rubicon-icon-font.ttf'),
     });
 }
-
 
 const AppWithDispatch = connect()(App);
 

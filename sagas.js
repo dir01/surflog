@@ -1,22 +1,21 @@
 import {all, takeEvery, select} from "redux-saga/effects";
 
-import {repository} from "./persistance";
+import repository from "./persistance";
 import {types} from "./actions";
 
 
 function* persistSurfSessions() {
-    function* _writeToStorage() {
-        const surfSessions = yield select(store => store.surfSessions);
-        yield repository.writeTodaySurfSessions(surfSessions)
-    }
+    yield takeEvery(types.SURF_SESSION_EDITED, function* (action) {
+        yield repository.upsertSurfSession(action.payload)
 
-    yield takeEvery(types.SURF_SESSION_ADDED, _writeToStorage);
-    yield takeEvery(types.SURF_SESSION_FINISHED, _writeToStorage);
-    yield takeEvery(types.SURF_SESSION_DELETED, _writeToStorage);
+    });
+    yield takeEvery(types.SURF_SESSION_DELETED, function* (action) {
+        yield repository.deleteSurfSession(action.surfSessionId)
+    });
 }
 
 function* persistSuggestItems() {
-    yield takeEvery(types.SURF_SESSION_ADDED, function* () {
+    yield takeEvery(types.SURF_SESSION_EDITED, function* () {
         const suggestItems = yield select(store => store.suggestItems);
         yield repository.writeSuggestItems(suggestItems);
     })

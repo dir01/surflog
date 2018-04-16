@@ -3,24 +3,18 @@ import {combineReducers} from 'redux';
 import {types} from "./actions";
 
 
-function surfSessions(state = [], action) {
-    const updateSurfSession = (surfSessionId, data) => {
-        const newState = [...state];
-        const sessionIndex = _.findIndex(newState, s => s.id === surfSessionId);
-        newState[sessionIndex] = {...newState[sessionIndex], ...data};
-        return newState;
-    };
+function surfSessions(state = {}, action) {
+    let newState = {...state};
     switch (action.type) {
         case types.SURF_SESSIONS_LOADED:
             return action.payload;
-        case types.SURF_SESSION_ADDED:
-            return [...state, action.payload];
-        case types.SURF_SESSION_FINISHED:
-            return updateSurfSession(action.surfSessionId, {endTime: action.endTime});
         case types.SURF_SESSION_DELETED:
-            return state.filter(s => s.id !== action.surfSessionId);
+            delete newState[action.surfSessionId];
+            return newState;
         case types.SURF_SESSION_EDITED:
-            return updateSurfSession(action.payload.id, action.payload);
+            const id = action.payload.id;
+            newState[id] = {...newState[id], ...action.payload};
+            return newState;
         default:
             return state;
     }
@@ -29,7 +23,7 @@ function surfSessions(state = [], action) {
 
 function suggestItems(state = {}, action) {
     switch (action.type) {
-        case types.SURF_SESSION_ADDED:
+        case types.SURF_SESSION_EDITED:
             const newState = {};
             for (const field of ['surfer', 'sail', 'board']) {
                 const value = action.payload[field];
