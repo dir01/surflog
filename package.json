@@ -24,6 +24,7 @@
   "dependencies": {
     "@shoutem/ui": "^0.23.5",
     "expo": "^25.0.0",
+    "firebase": "^4.12.1",
     "lodash": "^4.17.5",
     "mock-async-storage": "^2.0.2",
     "moment": "^2.22.1",

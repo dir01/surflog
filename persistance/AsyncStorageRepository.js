@@ -1,6 +1,6 @@
 import {AsyncStorage} from 'react-native';
 
-class Storage {
+class AsyncStorageRepository {
     async writeTodaySurfSessions(sessions) {
         await this._createDayIfRequired();
         await AsyncStorage.setItem(
@@ -42,7 +42,5 @@ class Storage {
 
 }
 
-
-const storage = new Storage();
-export default storage;
+export default new AsyncStorageRepository();
 

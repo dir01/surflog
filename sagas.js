@@ -1,13 +1,13 @@
 import {all, takeEvery, select} from "redux-saga/effects";
 
-import storage from "./storage";
+import {repository} from "./persistance";
 import {types} from "./actions";
 
 
 function* persistSurfSessions() {
     function* _writeToStorage() {
         const surfSessions = yield select(store => store.surfSessions);
-        yield storage.writeTodaySurfSessions(surfSessions)
+        yield repository.writeTodaySurfSessions(surfSessions)
     }
 
     yield takeEvery(types.SURF_SESSION_ADDED, _writeToStorage);
@@ -18,7 +18,7 @@ function* persistSurfSessions() {
 function* persistSuggestItems() {
     yield takeEvery(types.SURF_SESSION_ADDED, function* () {
         const suggestItems = yield select(store => store.suggestItems);
-        yield storage.writeSuggestItems(suggestItems);
+        yield repository.writeSuggestItems(suggestItems);
     })
 }
 

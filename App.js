@@ -5,11 +5,11 @@ import {Provider, connect} from 'react-redux';
 
 
 import configureStore from './configureStore';
-import storage from "./storage";
 import AddScreen from './AddScreen';
 import EditScreen from './EditScreen';
 import TodayScreen from './TodayScreen';
 import {actionCreators} from "./actions";
+import {repository} from "./persistance";
 
 
 
@@ -21,9 +21,9 @@ class App extends React.Component {
 
     async componentWillMount() {
         await loadFonts();
-        const surfSessions = await storage.getTodaySurfSessions();
+        const surfSessions = await repository.getTodaySurfSessions();
         this.props.dispatch(actionCreators.surfSessionsLoaded(surfSessions));
-        const suggestItems = await storage.loadSuggestItems();
+        const suggestItems = await repository.loadSuggestItems();
         this.props.dispatch(actionCreators.suggestItemsLoaded(suggestItems));
         this.setState({
             isLoadingComplete: true,
