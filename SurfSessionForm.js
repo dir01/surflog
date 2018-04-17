@@ -39,17 +39,17 @@ class AddForm extends React.Component {
             <View style={styles.formContainer}>
                 <ScrollView>
 
-                    {this.renderFormSection('surfer', renderSuggestions = true)}
+                    {this.renderFormSection('surfer')}
 
-                    {this.renderFormSection('sail', renderSuggestions = true)}
+                    {this.renderFormSection('sail')}
 
-                    {this.renderFormSection('board', renderSuggestions = true)}
+                    {this.renderFormSection('board')}
 
-                    {this.renderFormSection('startTime', renderSuggestions = false)}
+                    {this.renderFormSection('startTime')}
 
-                    {this.state.isEditing && this.renderFormSection('endTime', renderSuggestions = false)}
+                    {this.renderFormSection('endTime')}
 
-                    {!this.state.isEditing && this.renderFormSection('plannedDuration', renderSuggestions = false, inputValue = "30")}
+                    {this.renderFormSection('plannedDuration')}
 
                 </ScrollView>
                 <View>
@@ -83,7 +83,7 @@ class AddForm extends React.Component {
         this.componentWillMount()
     }
 
-    renderFormSection(name, renderSuggestions = false, inputValue = '') {
+    renderFormSection(name) {
         const error = this.state.errors[name];
         let input;
         return (
@@ -96,22 +96,28 @@ class AddForm extends React.Component {
                         inputRef={element => {
                             input = element
                         }}
-                        value={this.state[name] || inputValue}
+                        value={this.state[name]}
                         selectTextOnFocus={true}
                         onChangeText={(text) => {
                             this.setState({[name]: text})
                         }}
                         style={{...styles.input, placeholderTextColor: error ? 'red' : null}}
                         placeholder={error ? error : null}
+                        autoCorrect={false}
                     />
                 </Row>
-                {renderSuggestions ? this.renderSuggestions(name) : null}
+
+                {this.renderSuggestions(name)}
+
             </View>
         )
     }
 
     renderSuggestions(name) {
         const options = this.props.suggestItems[name] || [];
+        if (!options.length) {
+            return null;
+        }
         return (
             <View style={styles.suggestionContainer}>
                 {options.map((o) => (
@@ -121,7 +127,9 @@ class AddForm extends React.Component {
                         onPress={() => {
                             this.setState({[name]: o})
                         }}
-                    ><Text style={styles.suggestionText}>{o}</Text></Button>
+                    ><Text style={styles.suggestionText}>
+                        {o}
+                    </Text></Button>
                 ))}
             </View>
         )
