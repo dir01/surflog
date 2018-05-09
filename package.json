@@ -23,9 +23,9 @@
   },
   "dependencies": {
     "@shoutem/ui": "^0.23.5",
-    "expo": "^25.0.0",
-    "firebase": "^4.12.1",
-    "lodash": "^4.17.5",
+    "expo": "^25.0.1",
+    "firebase": "^4.13.1",
+    "lodash": "^4.17.10",
     "mock-async-storage": "^2.0.2",
     "moment": "^2.22.1",
     "pluralize": "^7.0.0",
@@ -33,7 +33,7 @@
     "react-native": "0.52.0",
     "react-native-swipeout": "^2.3.3",
     "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "^1.5.11",
+    "react-navigation": "^1.5.12",
     "react-redux": "^5.0.7",
     "redux-saga": "^0.16.0"
   }
